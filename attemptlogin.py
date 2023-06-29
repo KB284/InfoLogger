@@ -3,9 +3,11 @@ import time
 from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from bs4 import BeautifulSoup
 
 load_dotenv()
 
@@ -57,39 +59,38 @@ def login_info():
     wait = WebDriverWait(driver, timeout)
     element = wait.until(expected_condition)
 
-    element.is_displayed()
+
     time.sleep(5)
 
+
 def available_bountys():
-    # Define the expected condition to wait for (e.g., the presence of the bounty elements)
-    expected_condition = EC.presence_of_all_elements_located((By.CLASS_NAME, "relative"))
+    # Create a Chrome WebDriver with headless option
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    driver = webdriver.Chrome(options=chrome_options)
 
-    # Set the maximum time to wait for the condition to be met
-    timeout = 10  # Timeout in seconds
+    # Navigate to the HackerOne Opportunities page
+    driver.get("https://hackerone.com/opportunities/all")
 
-    # Wait for the condition to be met
-    wait = WebDriverWait(driver, timeout)
-    wait.until(expected_condition)
+    # Wait for the JavaScript to dynamically load the content
+    wait = WebDriverWait(driver, 10)
+    #wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".program-table__row")))
 
-    # Extract the bounty data
-    bounties = driver.find_elements(By.CLASS_NAME, "flex gap-xs")
-    print("Number of bounties found:", len(bounties))
+    # Create a Beautiful Soup object from the page source
+    soup = BeautifulSoup(driver.page_source, "html.parser")
 
-    # Process and print the bounty details
+    # Find the bounty elements and extract the information
+    bounties = soup.select(".program-table__row")
+
     for bounty in bounties:
-        title = bounty.find_element(By.CLASS_NAME, "w-0 grow truncate").text
-        bounty_type = bounty. find_element(By.TAG_NAME, 'strong')
-        reward = bounty.find_element(By.CLASS_NAME, "spec-amount-in-currency").text
-        print("Title: ", title)
-        print("Bounty: ", bounty_type)
-        print("Reward: ", reward)
-        print("---------------")
+        company_name = bounty.select_one(".program-table__name").text.strip()
+        bounty_amount = bounty.select_one(".program-table__reward").text.strip()
+        bounty_type = bounty.select_one(".program-table__type").text.strip()
 
-        time.sleep(3)
-
-        print(bounty)
-
-        return bounty
+        print("Company Name:", company_name)
+        print("Bounty Amount:", bounty_amount)
+        print("Bounty Type:", bounty_type)
+        print("----------------")
 
 
 search()
