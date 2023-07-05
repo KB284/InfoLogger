@@ -1,7 +1,6 @@
 from pynput import mouse, keyboard
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
 
 def get_element_name_from_website(url, x, y):
     response = requests.get(url)
