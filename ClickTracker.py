@@ -1,4 +1,4 @@
-from pynput import mouse, keyboard
+from pynput import mouse
 import requests
 from bs4 import BeautifulSoup
 
