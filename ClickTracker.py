@@ -33,4 +33,3 @@ mouse_listener.start()
 
 # Wait for the listener to finish
 mouse_listener.join()
-
