@@ -1,6 +1,7 @@
 import os
 import time
 from dotenv import load_dotenv
+import undetected_chromedriver as uc
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
@@ -11,10 +12,18 @@ from bs4 import BeautifulSoup
 
 load_dotenv()
 
-driver = webdriver.Chrome()
+## Example Proxy
+PROXY = "207.188.73.155:80"
+
+## Set Chrome Options
+options = uc.ChromeOptions()
+options.add_argument(f'--proxy-server={PROXY}')
+
+driver = uc.Chrome(options= options)
 driver.get('https://www.google.com')
 
-driver.fullscreen_window()
+driver.maximize_window()
+time.sleep(5)
 
 username = os.getenv("Email_Login")
 password = os.getenv("PASSWORD")
@@ -32,6 +41,11 @@ def search():
 def login_button():
     login_tab = driver.find_element(By.XPATH, '//*[@id="block-hackerone-topbar"]/ul/li[1]')
     login_tab.click()
+
+    time.sleep(5)
+
+    verify = driver.find_element(By.XPATH, '//*[@id="challenge-stage"]/div/label/input')
+    verify.click()
 
     time.sleep(5)
 
